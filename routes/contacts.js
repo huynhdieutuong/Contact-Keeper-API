@@ -29,7 +29,11 @@ router.post(
     auth,
     check("name", "Name is required")
       .not()
-      .isEmpty()
+      .isEmpty(),
+    check("type", "Type must be personal or professional").isIn([
+      "personal",
+      "professional"
+    ])
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -75,7 +79,9 @@ router.put("/:id", auth, async (req, res) => {
     if (contact.user.toString() !== req.user.id)
       return res.status(401).json({ msg: "Not Authorized" });
 
-    contact = await Contact.findByIdAndUpdate(req.params.id, contactFields);
+    contact = await Contact.findByIdAndUpdate(req.params.id, contactFields, {
+      new: true
+    });
 
     res.json(contact);
   } catch (error) {
