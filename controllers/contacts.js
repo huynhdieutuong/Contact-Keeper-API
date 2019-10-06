@@ -38,13 +38,12 @@ module.exports.createContact = async (req, res) => {
 };
 
 module.exports.updateContact = async (req, res) => {
-  const { name, email, phone, type } = req.body;
-  let contactFields = {};
-  if (name) contactFields.name = name;
-  if (email) contactFields.email = email;
-  if (phone) contactFields.phone = phone;
-  if (type) contactFields.type = type;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
+  const { name, email, phone, type } = req.body;
   try {
     let contact = await Contact.findById(req.params.id);
 
@@ -54,9 +53,13 @@ module.exports.updateContact = async (req, res) => {
     if (contact.user.toString() !== req.user.id)
       return res.status(401).json({ msg: "Not Authorized" });
 
-    contact = await Contact.findByIdAndUpdate(req.params.id, contactFields, {
-      new: true
-    });
+    contact = await Contact.findByIdAndUpdate(
+      req.params.id,
+      { name, email, phone, type },
+      {
+        new: true
+      }
+    );
 
     res.json(contact);
   } catch (error) {

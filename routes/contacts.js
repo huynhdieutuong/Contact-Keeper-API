@@ -22,7 +22,7 @@ router.post("/", validates.createContact, createContact);
 // @route   PUT api/contacts/:id
 // @desc    Update a contact
 // @access  Private
-router.put("/:id", updateContact);
+router.put("/:id", validates.createContact, updateContact);
 
 // @route   DELETE api/contacts/:id
 // @desc    Delete a contact
